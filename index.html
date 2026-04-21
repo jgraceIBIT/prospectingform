@@ -681,6 +681,15 @@
 <div class="pf-toast" id="pf-toast"></div>
 
 <script>
+  // Auto-sync company name from Section 1 to meta bar
+  document.getElementById('co-name').addEventListener('input', function() {
+    const metaCompany = document.getElementById('meta-company');
+    if (!metaCompany.value || metaCompany.value === this._lastSync) {
+      metaCompany.value = this.value;
+      this._lastSync = this.value;
+    }
+  });
+
   // Set today's date
   document.getElementById('meta-date').value = new Date().toISOString().split('T')[0];
 
@@ -766,7 +775,8 @@
   // Save to JSON file
   function saveForm() {
     const data = collectFormData();
-    const company = (data['meta-company'] || 'Prospect').replace(/\s+/g, '_').replace(/[^a-z0-9_]/gi, '');
+    const companyRaw = data['meta-company'] || data['co-name'] || 'Prospect';
+    const company = companyRaw.replace(/\s+/g, '_').replace(/[^a-z0-9_]/gi, '');
     const date = (data['meta-date'] || new Date().toISOString().split('T')[0]);
     const filename = `${company}_Prospecting_Form_${date}.json`;
     const blob = new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' });
