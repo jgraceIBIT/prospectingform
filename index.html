@@ -436,15 +436,9 @@
       </div>
       <div class="pf-grid pf-grid-4">
         <div class="pf-field"><div class="pf-label">Ticker</div><input class="pf-input" type="text" id="co-ticker"></div>
-        <div class="pf-field"><div class="pf-label">Founded</div><input class="pf-input" type="text" id="co-founded"></div>
         <div class="pf-field"><div class="pf-label">Employee Count</div><input class="pf-input" type="text" id="co-employees"></div>
         <div class="pf-field"><div class="pf-label">Revenue (2024)</div><input class="pf-input" type="text" id="co-revenue"></div>
-      </div>
-      <div class="pf-grid pf-grid-4">
-        <div class="pf-field"><div class="pf-label">Adj. EBITDA</div><input class="pf-input" type="text" id="co-ebitda"></div>
-        <div class="pf-field"><div class="pf-label">Net Income</div><input class="pf-input" type="text" id="co-netincome"></div>
         <div class="pf-field"><div class="pf-label">Industry</div><input class="pf-input" type="text" id="co-industry"></div>
-        <div class="pf-field"><div class="pf-label">Liquidity</div><input class="pf-input" type="text" id="co-liquidity"></div>
       </div>
       <div class="pf-grid pf-grid-3">
         <div class="pf-field"><div class="pf-label">CEO</div><input class="pf-input" type="text" id="co-ceo"></div>
@@ -708,7 +702,7 @@
   }
 
   // Build vendors table
-  const vendorsList = ['BlinkOps','CrowdStrike','Cyera','Palo Alto','ReliaQuest','Pure Storage','Rubrik','Zscaler','Wiz'];
+  const vendorsList = ['BlinkOps','CrowdStrike','Cyera','Fortinet','ReliaQuest','Pure Storage','Rubrik','Wiz'];
   const vendorsBody = document.getElementById('vendors-body');
   vendorsList.forEach((vendor, i) => {
     const tr = document.createElement('tr');
@@ -727,6 +721,26 @@
     `;
     vendorsBody.appendChild(tr);
   });
+
+  // Other vendor row with typeable company name
+  const otherIdx = vendorsList.length;
+  const otherTr = document.createElement('tr');
+  otherTr.innerHTML = `
+    <td style="padding:3px 4px;border-bottom:none;">
+      <input type="text" id="ven-other-company" placeholder="Other (specify)" style="font-family:'Source Sans 3',sans-serif;font-size:12px;font-weight:500;color:#5a6472;border:none;background:transparent;padding:5px 8px;width:100%;outline:none;">
+    </td>
+    <td><input type="text" id="ven-name-${otherIdx}" placeholder="Contact name"></td>
+    <td><input type="text" id="ven-mobile-${otherIdx}" placeholder="Mobile"></td>
+    <td><input type="text" id="ven-email-${otherIdx}" placeholder="Email"></td>
+    <td>
+      <select id="ven-status-${otherIdx}">
+        <option value="">— Select —</option>
+        <option value="Prospect">Prospect</option>
+        <option value="Install">Install</option>
+      </select>
+    </td>
+  `;
+  vendorsBody.appendChild(otherTr);
 
   function val(id) {
     const el = document.getElementById(id);
@@ -843,13 +857,9 @@
     body += line('Company Name', val('co-name'));
     body += line('HQ City', val('co-city'));
     body += line('Ticker', val('co-ticker'));
-    body += line('Founded', val('co-founded'));
     body += line('Employee Count', val('co-employees'));
     body += line('Revenue (2024)', val('co-revenue'));
-    body += line('Adj. EBITDA', val('co-ebitda'));
-    body += line('Net Income', val('co-netincome'));
     body += line('Industry', val('co-industry'));
-    body += line('Liquidity', val('co-liquidity'));
     body += line('CEO', val('co-ceo'));
     body += line('CIO', val('co-cio'));
     body += line('CISO', val('co-ciso'));
@@ -896,6 +906,21 @@
         body += line('  Status', status);
       }
     });
+    // Other vendor row
+    const otherCompany = val('ven-other-company');
+    const otherIdx = vendorsList.length;
+    const otherName = val(`ven-name-${otherIdx}`);
+    const otherMobile = val(`ven-mobile-${otherIdx}`);
+    const otherEmail = val(`ven-email-${otherIdx}`);
+    const otherStatus = val(`ven-status-${otherIdx}`);
+    if (otherCompany || otherName || otherEmail) {
+      hasVendors = true;
+      body += `${otherCompany || 'Other'}:\n`;
+      body += line('  Contact', otherName);
+      body += line('  Mobile', otherMobile);
+      body += line('  Email', otherEmail);
+      body += line('  Status', otherStatus);
+    }
     if (!hasVendors) body += '(none entered)\n';
     body += '\n';
 
